@@ -1,91 +1,52 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "nregine.h"
 
-/*Posizionare su una scacchiera NxN N regine in modo che nessuna ne minacci un'altra. Trovare tutte le possibili soluzioni*/
+void Scelta0(int* riga, int* colonna, int* DiagP, int* DiagS, int i, int j, int N){
 
-void printmat(matrix* m) {
-	for (int i = 0; i < m->rows; i++) {
-		for (int j = 0; j < m->cols; j++) {
-			printf("%d ", m->data[i*m->cols + j]);
-		}
-		printf("\n");
-	}
-}
-//
-//int checkRiga(matrix* m, int i) {
-//
-//	for (int j = 0; j < m->cols; j++) {
-//		if (m->data[i + j] == 1) return 0;
-//	}
-//	
-//	return 1;
-//}
-
-int checkRiga(matrix* mcurr) {
-
-	int ce = 0;
-	for (int r = 0; r < mcurr->rows; r++) {
-		for (int c = 0; c < mcurr->cols; c++) {
-			if (mcurr->data[r * mcurr->cols + c] == 1) ce++;
-		}
-		if (ce > 1) return 0;
-		ce = 0;
-	}
-
-	return 1;
+	riga[i] = 0;
+	colonna[j] = 0;
+	DiagP[i + j - 1] = 0;
+	DiagS[i - j + N] = 0;
 }
 
-int checkColonna(matrix* mcurr) {
+void Scelta1(int* riga, int* colonna, int* DiagP, int* DiagS, int i, int j, int N){
 
-	int ce = 0;
-	for (int r = 0; r < mcurr->rows; r++) {
-		for (int c = 0; c < mcurr->cols; c++) {
-			if (mcurr->data[c * mcurr->cols + r] == 1) ce++;
-		}
-		if (ce > 1) return 0;
-		ce = 0;
-	}
-
-	return 1;
+	riga[i] = 1;
+	colonna[j] = 1;
+	DiagP[i + j - 1] = 1;
+	DiagS[i - j + N] = 1;
 }
 
+void Nregine(int* riga, int* colonna, int* DiagP, int* DiagS, int i, int j, int N, int* Sol){
 
-void nregine(matrix *mcurr, int n, int *nsol, int i, int *npos) {
-
-	if (i == n*n /*|| *npos == n*/) {//se ho scorso tutta la matrice o ho posizionato tutte le regine
-
-		if (!checkRiga(mcurr) || !checkColonna(mcurr)) return;
-
-		(*nsol)++;
-		printmat(mcurr);
-		printf("\n");
+	if((i == N + 1)&&(j == N + 1))
+	{
+		for (int r = 0; r < i; i++)
+		{
+			printf("%d", riga[r]);
+		}
+		printf("/n");
+		(*Sol)++;
 		return;
 	}
 
-	mcurr->data[i] = 0;
-	nregine(mcurr, n, nsol, i + 1, npos);
-
-	//if (checkRiga(mcurr, i)) {
-		mcurr->data[i] = 1;
-		//(*npos)++;
-		nregine(mcurr, n, nsol, i + 1, npos);
-	//}
+	Scelta0(riga, colonna, DiagP, DiagS, i, j, N);
+	Nregine(riga, colonna, DiagP, DiagS, i + 1, j + 1, N, &Sol);
+	Scelta1(riga, colonna, DiagP, DiagS, i, j, N);
+	Nregine(riga, colonna, DiagP, DiagS, i + 1, j + 1, N, &Sol);
 
 }
 
 int main(void) {
 	
-	int n = 3;
-	matrix* mat = malloc(sizeof(matrix));
-	mat->cols = n;
-	mat->rows = n;
-	mat->data = calloc(mat->cols * mat->rows, sizeof(int));
-	int nsol = 0;
-	int npos = 0;
-
-	nregine(mat, n, &nsol, 0, &npos);
-	printf("\nnsol: %d", nsol);
-
+	int N = 3;
+	int Sol = 0;
+	int* riga = calloc(N, sizeof(int));
+	int* colonna = calloc(N, sizeof(int));
+	int* DiagP = calloc((2 * N - 1), sizeof(int));
+	int* DiagS = calloc((2 * N - 1), sizeof(int));
+	Nregine(riga, colonna, DiagP, DiagS, 0, 0, N - 1, &Sol);
+	printf("nsol: %d", Sol);
+	
 	return 0;
 }
