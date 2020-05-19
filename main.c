@@ -4,7 +4,7 @@
 
 /*Posizionare su una scacchiera NxN N regine in modo che nessuna ne minacci un'altra. Trovare tutte le possibili soluzioni*/
 
-void printmat(matrix* m) {
+void printMat(matrix* m) {
 	for (int i = 0; i < m->rows; i++) {
 		for (int j = 0; j < m->cols; j++) {
 			printf("%d ", m->data[i * m->cols + j]);
@@ -60,50 +60,17 @@ int checkDiagonale(matrix* m, int i) {
 	return 1;
 }
 
-void stampa(matrix* m, int n) {
-
-	int r = 1, c = 1;
-
-	for (int i = 0; i < n * n; i++) {
-		m->data[i] = rand() % 10;
-	}
-
-	printf("diagonale principale sotto\n");
-	//diagonale principale sotto
-	for (int j = r + 1, k = c + 1; j < m->rows && k < m->cols; j++, k++) {
-		printf("%d ", m->data[j * m->rows + k]);
-	}
-	printf("\n");
-	printf("diagonale principale sopra\n");
-	//diagonale principale sopra
-	for (int j = r - 1, k = c - 1; j >= 0 && k >= 0; j--, k--) {
-		printf("%d ", m->data[j * m->rows + k]);
-	}
-	printf("\n");
-	printf("diagonale secondaria sotto\n");
-	//diagonale secondaria sotto
-	for (int j = r + 1, k = c - 1; j < m->rows && k >= 0; j++, k--) {
-		printf("%d ", m->data[j * m->rows + k]);
-	}
-	printf("\n");
-	printf("diagonale secondaria sopra\n");
-	//diagonale secondaria sopra
-	for (int j = r - 1, k = c + 1; j >= 0 && k < m->cols; j--, k++) {
-		printf("%d ", m->data[j * m->rows + k]);
-	}
-
-}
-
 void nregine(matrix* mcurr, int n, int* nsol, int i, int npos) {
-	if (i >= n * n)
-		return;
-
-	if (npos == n) {//se ho scorso tutta la matrice o ho posizionato tutte le regine
+	
+	if (npos == n) {//se ho posizionato tutte le regine
 		(*nsol)++;
-		printmat(mcurr);
+		printMat(mcurr);
 		printf("\n");
 		return;
 	}
+
+	if (i >= n * n)
+		return;
 
 	mcurr->data[i] = 0;
 	nregine(mcurr, n, nsol, i + 1, npos);
@@ -117,8 +84,8 @@ void nregine(matrix* mcurr, int n, int* nsol, int i, int npos) {
 
 int main(void) {
 
+	int n = 9;
 
-	int n = 5;
 	matrix* mat = malloc(sizeof(matrix));
 	mat->cols = n;
 	mat->rows = n;
@@ -128,10 +95,10 @@ int main(void) {
 
 	nregine(mat, n, &nsol, 0, npos);
 
-	//stampa(mat, n);
+	printf("\nNumero soluzioni: %d", nsol);
 
-	printf("\nnsol: %d", nsol);
-
+	free(mat->data);
+	free(mat);
 
 	return 0;
 }
